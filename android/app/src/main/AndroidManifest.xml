@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme.ObjectDetection"
         android:hardwareAccelerated="true"
         android:debuggable="true"
-        android:installLocation="internalOnly">
+        android:installLocation="preferExternal">
 
         <activity
             android:name=".DetectorActivity"
