@@ -191,7 +191,7 @@ public abstract class CameraActivity extends AppCompatActivity
             } else {
               gestureLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
-            //                int width = bottomSheetLayout.getMeasuredWidth();
+            int width = bottomSheetLayout.getMeasuredWidth();
             int height = gestureLayout.getMeasuredHeight();
 
             sheetBehavior.setPeekHeight(height);
@@ -341,6 +341,7 @@ public abstract class CameraActivity extends AppCompatActivity
 
 
 
+
       isProcessingFrame = true;
       Trace.beginSection("imageAvailable");
       final Plane[] planes = image.getPlanes();
@@ -349,8 +350,10 @@ public abstract class CameraActivity extends AppCompatActivity
       final int uvRowStride = planes[1].getRowStride();
       final int uvPixelStride = planes[1].getPixelStride();
 
-//      TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
-//      TextRecognition(textRecognizer,planes);
+      TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
+
+
+      TextRecognition(textRecognizer,image);
 
       imageConverter =
           new Runnable() {
@@ -387,40 +390,43 @@ public abstract class CameraActivity extends AppCompatActivity
     Trace.endSection();
   }
 
-  private void TextRecognition(TextRecognizer recognizer, final Plane[] planes){
+  private void TextRecognition(TextRecognizer recognizer, final Image image){
 
-    final ByteBuffer buffer = planes[0].getBuffer();
-    int offset = 0;
-    int pixelStride = planes[0].getPixelStride();
-    int rowStride = planes[0].getRowStride();
-    int rowPadding = rowStride - pixelStride * previewWidth;
-// create bitmap
-    final Bitmap bitmap = Bitmap.createBitmap(previewWidth+rowPadding/pixelStride, previewHeight, Bitmap.Config.RGB_565);
-    bitmap.copyPixelsFromBuffer(buffer);
+    Log.v("Test","AAAAAAAAA");
 
 
-    InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+    ByteBuffer buffer_ = image.getPlanes()[0].getBuffer();
+    byte[] bytes = new byte[buffer_.capacity()];
+    buffer_.get(bytes);
+    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
 
 
-//    Task<Text> result = recognizer.process(inputImage)
-//            // 이미지 인식에 성공하면 실행되는 리스너
-//            .addOnSuccessListener(new OnSuccessListener<Text>() {
-//              @Override
-//              public void onSuccess(Text visionText) {
-//                Log.e("텍스트 인식", "성공");
-//                // Task completed successfully
-//                String resultText = visionText.getText();
-////                text_info.setText(resultText);  // 인식한 텍스트를 TextView에 세팅
-//              }
-//            })
-//            // 이미지 인식에 실패하면 실행되는 리스너
-//            .addOnFailureListener(
-//                    new OnFailureListener() {
-//                      @Override
-//                      public void onFailure(@NonNull Exception e) {
-//                        Log.e("텍스트 인식", "실패: " + e.getMessage());
-//                      }
-//                    });
+    InputImage inputImage = InputImage.fromBitmap(bitmapImage, 0);
+
+
+
+
+    Task<Text> result = recognizer.process(inputImage)
+            // 이미지 인식에 성공하면 실행되는 리스너
+            .addOnSuccessListener(new OnSuccessListener<Text>() {
+              @Override
+              public void onSuccess(Text visionText) {
+                Log.e("텍스트 인식", "성공");
+                // Task completed successfully
+                String resultText = visionText.getText();
+                Log.v("Test",resultText);
+//                text_info.setText(resultText);  // 인식한 텍스트를 TextView에 세팅
+              }
+            })
+            // 이미지 인식에 실패하면 실행되는 리스너
+            .addOnFailureListener(
+                    new OnFailureListener() {
+                      @Override
+                      public void onFailure(@NonNull Exception e) {
+                        Log.v("Test","failed");
+                        Log.e("텍스트 인식", "실패: " + e.getMessage());
+                      }
+                    });
   }
 
   @Override
