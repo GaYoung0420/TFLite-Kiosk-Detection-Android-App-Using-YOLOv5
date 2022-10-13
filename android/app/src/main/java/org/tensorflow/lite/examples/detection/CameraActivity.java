@@ -313,6 +313,8 @@ public abstract class CameraActivity extends AppCompatActivity
     processImage();
 
 
+//    Log.d("Test","AAAAAAAAA");
+
 
   }
 
@@ -341,7 +343,6 @@ public abstract class CameraActivity extends AppCompatActivity
 
 
 
-
       isProcessingFrame = true;
       Trace.beginSection("imageAvailable");
       final Plane[] planes = image.getPlanes();
@@ -350,7 +351,9 @@ public abstract class CameraActivity extends AppCompatActivity
       final int uvRowStride = planes[1].getRowStride();
       final int uvPixelStride = planes[1].getPixelStride();
 
+
       TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
+
 
 
       TextRecognition(textRecognizer,image);
@@ -392,9 +395,6 @@ public abstract class CameraActivity extends AppCompatActivity
 
   private void TextRecognition(TextRecognizer recognizer, final Image image){
 
-    Log.v("Test","AAAAAAAAA");
-
-
     ByteBuffer buffer_ = image.getPlanes()[0].getBuffer();
     byte[] bytes = new byte[buffer_.capacity()];
     buffer_.get(bytes);
@@ -402,7 +402,6 @@ public abstract class CameraActivity extends AppCompatActivity
 
 
     InputImage inputImage = InputImage.fromBitmap(bitmapImage, 0);
-
 
 
 
