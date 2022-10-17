@@ -117,7 +117,10 @@ public abstract class CameraActivity extends AppCompatActivity
   int currentModel = -1;
   int currentNumThreads = -1;
 
+  Image image = null;
+
   ArrayList<String> deviceStrings = new ArrayList<String>();
+  TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -310,6 +313,7 @@ public abstract class CameraActivity extends AppCompatActivity
             isProcessingFrame = false;
           }
         };
+    TextRecognition(textRecognizer);
     processImage();
 
 
@@ -328,7 +332,7 @@ public abstract class CameraActivity extends AppCompatActivity
       rgbBytes = new int[previewWidth * previewHeight];
     }
     try {
-      final Image image = reader.acquireLatestImage();
+      image = reader.acquireLatestImage();
 
       if (image == null) {
         return;
@@ -350,10 +354,10 @@ public abstract class CameraActivity extends AppCompatActivity
       final int uvRowStride = planes[1].getRowStride();
       final int uvPixelStride = planes[1].getPixelStride();
 
-      TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
 
 
-      TextRecognition(textRecognizer,image);
+
+
 
       imageConverter =
           new Runnable() {
@@ -380,8 +384,9 @@ public abstract class CameraActivity extends AppCompatActivity
               isProcessingFrame = false;
             }
           };
-
+      TextRecognition(textRecognizer);
       processImage();
+
     } catch (final Exception e) {
       LOGGER.e(e, "Exception!");
       Trace.endSection();
@@ -390,16 +395,16 @@ public abstract class CameraActivity extends AppCompatActivity
     Trace.endSection();
   }
 
-  private void TextRecognition(TextRecognizer recognizer, final Image image){
+  private void TextRecognition(TextRecognizer recognizer){
 
-    Log.v("Test","AAAAAAAAA");
+    Log.v("Test","TextRecognition image : " + image);
+//
+//    ByteBuffer buffer_ = image.getPlanes()[0].getBuffer();
+//    byte[] bytes = new byte[buffer_.capacity()];
+//    buffer_.get(bytes);
+//    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
 
-
-    ByteBuffer buffer_ = image.getPlanes()[0].getBuffer();
-    byte[] bytes = new byte[buffer_.capacity()];
-    buffer_.get(bytes);
-    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-
+    Bitmap bitmapImage = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
 
     InputImage inputImage = InputImage.fromBitmap(bitmapImage, 0);
 
@@ -411,7 +416,7 @@ public abstract class CameraActivity extends AppCompatActivity
             .addOnSuccessListener(new OnSuccessListener<Text>() {
               @Override
               public void onSuccess(Text visionText) {
-                Log.e("텍스트 인식", "성공");
+//                Log.e("텍스트 인식", "성공");
                 // Task completed successfully
                 String resultText = visionText.getText();
                 Log.v("Test",resultText);
