@@ -388,7 +388,7 @@ public abstract class CameraActivity extends AppCompatActivity
       processImage();
 
     } catch (final Exception e) {
-      LOGGER.e(e, "Exception!");
+      LOGGER.e(e, "Exception!" + e);
       Trace.endSection();
       return;
     }
@@ -398,13 +398,23 @@ public abstract class CameraActivity extends AppCompatActivity
   private void TextRecognition(TextRecognizer recognizer){
 
     Log.v("Test","TextRecognition image : " + image);
-//
-//    ByteBuffer buffer_ = image.getPlanes()[0].getBuffer();
-//    byte[] bytes = new byte[buffer_.capacity()];
-//    buffer_.get(bytes);
-//    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
 
-    Bitmap bitmapImage = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
+
+    ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+    byte[] bytes = new byte[buffer.remaining()];
+    //buffer의 capacity를 넘어서서 읽기를 시도할 경우 java.nio.BufferUnderflowException이 발생
+    buffer.get(bytes);
+    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+
+
+//    Bitmap bitmapImage = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
+
+
+//    Bitmap rgbFrameBitmap;
+//    int[] cachedRgbBytes;
+//    cachedRgbBytes = ImageUtils.convertImageToBitmap(image, cachedRgbBytes, cachedYuvBytes);
+//    rgbFrameBitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
+//    rgbFrameBitmap.setPixels(cachedRgbBytes,0,image.getWidth(), 0, 0,image.getWidth(), image.getHeight());
 
     InputImage inputImage = InputImage.fromBitmap(bitmapImage, 0);
 
