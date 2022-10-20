@@ -450,8 +450,8 @@ public abstract class CameraActivity extends AppCompatActivity
       for (int j = 0; j < lines.size(); j++) {
         List<Text.Element> elements = lines.get(j).getElements();
         for (int k = 0; k < elements.size(); k++) {
-//          GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
-//          mGraphicOverlay.add(textGraphic);
+          GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
+          mGraphicOverlay.add(textGraphic);
 
         }
       }
