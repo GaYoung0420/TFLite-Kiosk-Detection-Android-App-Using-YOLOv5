@@ -71,6 +71,7 @@ import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
@@ -121,6 +122,10 @@ public abstract class CameraActivity extends AppCompatActivity
 
   ArrayList<String> deviceStrings = new ArrayList<String>();
   TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
+
+  private Bitmap rgbFrameBitmap = null;
+
+  private GraphicOverlay mGraphicOverlay;
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -375,7 +380,7 @@ public abstract class CameraActivity extends AppCompatActivity
                   rgbBytes);
             }
           };
-
+      Log.v("Test","TTTT :    " + imageConverter);
       postInferenceCallback =
           new Runnable() {
             @Override
@@ -398,25 +403,13 @@ public abstract class CameraActivity extends AppCompatActivity
   private void TextRecognition(TextRecognizer recognizer){
 
     Log.v("Test","TextRecognition image : " + image);
+    Log.v("Test","TextRecognition getFormat() : " + image.getFormat());
 
+    rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
 
-    ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-    byte[] bytes = new byte[buffer.remaining()];
-    //buffer의 capacity를 넘어서서 읽기를 시도할 경우 java.nio.BufferUnderflowException이 발생
-    buffer.get(bytes);
-    Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+    rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
 
-
-//    Bitmap bitmapImage = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
-
-
-//    Bitmap rgbFrameBitmap;
-//    int[] cachedRgbBytes;
-//    cachedRgbBytes = ImageUtils.convertImageToBitmap(image, cachedRgbBytes, cachedYuvBytes);
-//    rgbFrameBitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
-//    rgbFrameBitmap.setPixels(cachedRgbBytes,0,image.getWidth(), 0, 0,image.getWidth(), image.getHeight());
-
-    InputImage inputImage = InputImage.fromBitmap(bitmapImage, 0);
+    InputImage inputImage = InputImage.fromBitmap(rgbFrameBitmap, 0);
 
 
 
@@ -428,9 +421,11 @@ public abstract class CameraActivity extends AppCompatActivity
               public void onSuccess(Text visionText) {
 //                Log.e("텍스트 인식", "성공");
                 // Task completed successfully
-                String resultText = visionText.getText();
-                Log.v("Test",resultText);
+//                String resultText = visionText.getText();
+//                Log.v("Success",resultText);
 //                text_info.setText(resultText);  // 인식한 텍스트를 TextView에 세팅
+
+                processTextRecognitionResult(visionText);
               }
             })
             // 이미지 인식에 실패하면 실행되는 리스너
@@ -442,6 +437,25 @@ public abstract class CameraActivity extends AppCompatActivity
                         Log.e("텍스트 인식", "실패: " + e.getMessage());
                       }
                     });
+  }
+  private void processTextRecognitionResult(Text texts) {
+    List<Text.TextBlock> blocks = texts.getTextBlocks();
+    if (blocks.size() == 0) {
+      Log.v("Test","failed");
+      return;
+    }
+    mGraphicOverlay.clear();
+    for (int i = 0; i < blocks.size(); i++) {
+      List<Text.Line> lines = blocks.get(i).getLines();
+      for (int j = 0; j < lines.size(); j++) {
+        List<Text.Element> elements = lines.get(j).getElements();
+        for (int k = 0; k < elements.size(); k++) {
+//          GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
+//          mGraphicOverlay.add(textGraphic);
+
+        }
+      }
+    }
   }
 
   @Override
