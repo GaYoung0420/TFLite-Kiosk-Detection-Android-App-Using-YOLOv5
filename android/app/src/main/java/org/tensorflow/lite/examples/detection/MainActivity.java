@@ -39,26 +39,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cameraButton = findViewById(R.id.cameraButton);
-        detectButton = findViewById(R.id.detectButton);
-        imageView = findViewById(R.id.imageView);
+//        cameraButton = findViewById(R.id.cameraButton);
+//        detectButton = findViewById(R.id.detectButton);
+//        imageView = findViewById(R.id.imageView);
 
-        cameraButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, DetectorActivity.class)));
+//        cameraButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, DetectorActivity.class)));
 
-        detectButton.setOnClickListener(v -> {
-            Handler handler = new Handler();
-
-            new Thread(() -> {
-                final List<Classifier.Recognition> results = detector.recognizeImage(cropBitmap);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        handleResult(cropBitmap, results);
-                    }
-                });
-            }).start();
-
-        });
+//        detectButton.setOnClickListener(v -> {
+//            Handler handler = new Handler();
+//
+//            new Thread(() -> {
+//                final List<Classifier.Recognition> results = detector.recognizeImage(cropBitmap);
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        handleResult(cropBitmap, results);
+//                    }
+//                });
+//            }).start();
+//
+//        });
         this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "kite.jpg");
 
         this.cropBitmap = Utils.processBitmap(sourceBitmap, TF_OD_API_INPUT_SIZE);
@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
         initBox();
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+//        ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
 
-        System.err.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
-        System.err.println(configurationInfo.reqGlEsVersion >= 0x30000);
-        System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
+//        System.err.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
+//        System.err.println(configurationInfo.reqGlEsVersion >= 0x30000);
+//        System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
     }
 
     private static final Logger LOGGER = new Logger();

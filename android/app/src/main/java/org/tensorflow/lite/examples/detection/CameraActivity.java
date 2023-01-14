@@ -76,11 +76,13 @@ import java.util.List;
 import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
 
+
 public abstract class CameraActivity extends AppCompatActivity
     implements OnImageAvailableListener,
-        Camera.PreviewCallback,
+        Camera.PreviewCallback
 //        CompoundButton.OnCheckedChangeListener,
-        View.OnClickListener {
+//        View.OnClickListener
+{
   private static final Logger LOGGER = new Logger();
 
   private static final int PERMISSIONS_REQUEST = 1;
@@ -103,13 +105,6 @@ public abstract class CameraActivity extends AppCompatActivity
   private Runnable imageConverter;
   protected ArrayList<String> modelStrings = new ArrayList<String>();
 
-  private LinearLayout bottomSheetLayout;
-  private LinearLayout gestureLayout;
-  private BottomSheetBehavior<LinearLayout> sheetBehavior;
-
-  protected TextView frameValueTextView, cropValueTextView, inferenceTimeTextView;
-  protected ImageView bottomSheetArrowImageView;
-  private ImageView plusImageView, minusImageView;
   protected ListView deviceView;
   protected TextView threadsTextView;
   protected ListView modelView;
@@ -125,7 +120,7 @@ public abstract class CameraActivity extends AppCompatActivity
 
   private Bitmap rgbFrameBitmap = null;
 
-  private GraphicOverlay mGraphicOverlay;
+//  private GraphicOverlay mGraphicOverlay;
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -134,7 +129,7 @@ public abstract class CameraActivity extends AppCompatActivity
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     setContentView(R.layout.tfe_od_activity_camera);
-    Toolbar toolbar = findViewById(R.id.toolbar);
+//    Toolbar toolbar = findViewById(R.id.toolbar);
 //    setSupportActionBar(toolbar);
 //    getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -144,33 +139,33 @@ public abstract class CameraActivity extends AppCompatActivity
       requestPermission();
     }
 
-    threadsTextView = findViewById(R.id.threads);
-    currentNumThreads = Integer.parseInt(threadsTextView.getText().toString().trim());
-    plusImageView = findViewById(R.id.plus);
-    minusImageView = findViewById(R.id.minus);
-    deviceView = findViewById(R.id.device_list);
+//    threadsTextView = findViewById(R.id.threads);
+//    currentNumThreads = Integer.parseInt(threadsTextView.getText().toString().trim());
+//    plusImageView = findViewById(R.id.plus);
+//    minusImageView = findViewById(R.id.minus);
+//    deviceView = findViewById(R.id.device_list);
     deviceStrings.add("CPU");
     deviceStrings.add("GPU");
     deviceStrings.add("NNAPI");
-    deviceView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    ArrayAdapter<String> deviceAdapter =
-            new ArrayAdapter<>(
-                    CameraActivity.this , R.layout.deviceview_row, R.id.deviceview_row_text, deviceStrings);
-    deviceView.setAdapter(deviceAdapter);
-    deviceView.setItemChecked(defaultDeviceIndex, true);
-    currentDevice = defaultDeviceIndex;
-    deviceView.setOnItemClickListener(
-            new AdapterView.OnItemClickListener() {
-              @Override
-              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                updateActiveModel();
-              }
-            });
+//    deviceView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+//    ArrayAdapter<String> deviceAdapter =
+//            new ArrayAdapter<>(
+//                    CameraActivity.this , R.layout.deviceview_row, R.id.deviceview_row_text, deviceStrings);
+//    deviceView.setAdapter(deviceAdapter);
+//    deviceView.setItemChecked(defaultDeviceIndex, true);
+//    currentDevice = defaultDeviceIndex;
+//    deviceView.setOnItemClickListener(
+//            new AdapterView.OnItemClickListener() {
+//              @Override
+//              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                updateActiveModel();
+//              }
+//            });
 
-    bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
-    gestureLayout = findViewById(R.id.gesture_layout);
-    sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-    bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
+//    bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
+//    gestureLayout = findViewById(R.id.gesture_layout);
+//    sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+//    bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
     modelView = findViewById((R.id.model_list));
 
     modelStrings = getModelStrings(getAssets(), ASSET_PATH);
@@ -181,64 +176,64 @@ public abstract class CameraActivity extends AppCompatActivity
     modelView.setAdapter(modelAdapter);
     modelView.setItemChecked(defaultModelIndex, true);
     currentModel = defaultModelIndex;
-    modelView.setOnItemClickListener(
-            new AdapterView.OnItemClickListener() {
-              @Override
-              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                updateActiveModel();
-              }
-            });
+//    modelView.setOnItemClickListener(
+//            new AdapterView.OnItemClickListener() {
+//              @Override
+//              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                updateActiveModel();
+//              }
+//            });
 
-    ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
-    vto.addOnGlobalLayoutListener(
-        new ViewTreeObserver.OnGlobalLayoutListener() {
-          @Override
-          public void onGlobalLayout() {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-              gestureLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-            } else {
-              gestureLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-            int width = bottomSheetLayout.getMeasuredWidth();
-            int height = gestureLayout.getMeasuredHeight();
+//    ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
+//    vto.addOnGlobalLayoutListener(
+//        new ViewTreeObserver.OnGlobalLayoutListener() {
+//          @Override
+//          public void onGlobalLayout() {
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+//              gestureLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//            } else {
+//              gestureLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//            }
+//            int width = bottomSheetLayout.getMeasuredWidth();
+//            int height = gestureLayout.getMeasuredHeight();
+//
+////            sheetBehavior.setPeekHeight(height);
+//          }
+//        });
+//    sheetBehavior.setHideable(false);
 
-            sheetBehavior.setPeekHeight(height);
-          }
-        });
-    sheetBehavior.setHideable(false);
+//    sheetBehavior.setBottomSheetCallback(
+////        new BottomSheetBehavior.BottomSheetCallback() {
+////          @Override
+////          public void onStateChanged(@NonNull View bottomSheet, int newState) {
+////            switch (newState) {
+////              case BottomSheetBehavior.STATE_HIDDEN:
+////                break;
+////              case BottomSheetBehavior.STATE_EXPANDED:
+////                {
+//////                  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_down);
+////                }
+////                break;
+////              case BottomSheetBehavior.STATE_COLLAPSED:
+////                {
+//////                  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
+////                }
+////                break;
+////              case BottomSheetBehavior.STATE_DRAGGING:
+////                break;
+////              case BottomSheetBehavior.STATE_SETTLING:
+//////                bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
+////                break;
+////            }
+//          }
 
-    sheetBehavior.setBottomSheetCallback(
-        new BottomSheetBehavior.BottomSheetCallback() {
-          @Override
-          public void onStateChanged(@NonNull View bottomSheet, int newState) {
-            switch (newState) {
-              case BottomSheetBehavior.STATE_HIDDEN:
-                break;
-              case BottomSheetBehavior.STATE_EXPANDED:
-                {
-                  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_down);
-                }
-                break;
-              case BottomSheetBehavior.STATE_COLLAPSED:
-                {
-                  bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
-                }
-                break;
-              case BottomSheetBehavior.STATE_DRAGGING:
-                break;
-              case BottomSheetBehavior.STATE_SETTLING:
-                bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
-                break;
-            }
-          }
+//          @Override
+//          public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
+//        });
 
-          @Override
-          public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
-        });
-
-    frameValueTextView = findViewById(R.id.frame_info);
-    cropValueTextView = findViewById(R.id.crop_info);
-    inferenceTimeTextView = findViewById(R.id.inference_info);
+//    frameValueTextView = findViewById(R.id.frame_info);
+//    cropValueTextView = findViewById(R.id.crop_info);
+//    inferenceTimeTextView = findViewById(R.id.inference_info);
 
 //    plusImageView.setOnClickListener(this);
 //    minusImageView.setOnClickListener(this);
@@ -380,7 +375,7 @@ public abstract class CameraActivity extends AppCompatActivity
                   rgbBytes);
             }
           };
-      Log.v("Test","TTTT :    " + imageConverter);
+
       postInferenceCallback =
           new Runnable() {
             @Override
@@ -419,11 +414,12 @@ public abstract class CameraActivity extends AppCompatActivity
             .addOnSuccessListener(new OnSuccessListener<Text>() {
               @Override
               public void onSuccess(Text visionText) {
-//                Log.e("텍스트 인식", "성공");
+                Log.v("텍스트 인식", "성공");
                 // Task completed successfully
-//                String resultText = visionText.getText();
+                String resultText = visionText.getText();
 //                Log.v("Success",resultText);
 //                text_info.setText(resultText);  // 인식한 텍스트를 TextView에 세팅
+                Log.v("텍스트 인식", resultText);
 
                 processTextRecognitionResult(visionText);
               }
@@ -434,7 +430,7 @@ public abstract class CameraActivity extends AppCompatActivity
                       @Override
                       public void onFailure(@NonNull Exception e) {
                         Log.v("Test","failed");
-                        Log.e("텍스트 인식", "실패: " + e.getMessage());
+                        Log.v("텍스트 인식", "실패: " + e.getMessage());
                       }
                     });
   }
@@ -444,18 +440,18 @@ public abstract class CameraActivity extends AppCompatActivity
       Log.v("Test","failed");
       return;
     }
-    mGraphicOverlay.clear();
-    for (int i = 0; i < blocks.size(); i++) {
-      List<Text.Line> lines = blocks.get(i).getLines();
-      for (int j = 0; j < lines.size(); j++) {
-        List<Text.Element> elements = lines.get(j).getElements();
-        for (int k = 0; k < elements.size(); k++) {
-          GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
-          mGraphicOverlay.add(textGraphic);
-
-        }
-      }
-    }
+//    mGraphicOverlay.clear();
+//    for (int i = 0; i < blocks.size(); i++) {
+//      List<Text.Line> lines = blocks.get(i).getLines();
+//      for (int j = 0; j < lines.size(); j++) {
+//        List<Text.Element> elements = lines.get(j).getElements();
+//        for (int k = 0; k < elements.size(); k++) {
+//          GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
+//          mGraphicOverlay.add(textGraphic);
+//
+//        }
+//      }
+//    }
   }
 
   @Override
@@ -672,38 +668,38 @@ public abstract class CameraActivity extends AppCompatActivity
 //    else apiSwitchCompat.setText("TFLITE");
 //  }
 
-  @Override
-  public void onClick(View v) {
-    if (v.getId() == R.id.plus) {
-      String threads = threadsTextView.getText().toString().trim();
-      int numThreads = Integer.parseInt(threads);
-      if (numThreads >= 9) return;
-      numThreads++;
-      threadsTextView.setText(String.valueOf(numThreads));
-      setNumThreads(numThreads);
-    } else if (v.getId() == R.id.minus) {
-      String threads = threadsTextView.getText().toString().trim();
-      int numThreads = Integer.parseInt(threads);
-      if (numThreads == 1) {
-        return;
-      }
-      numThreads--;
-      threadsTextView.setText(String.valueOf(numThreads));
-      setNumThreads(numThreads);
-    }
-  }
+//  @Override
+//  public void onClick(View v) {
+//    if (v.getId() == R.id.plus) {
+//      String threads = threadsTextView.getText().toString().trim();
+//      int numThreads = Integer.parseInt(threads);
+//      if (numThreads >= 9) return;
+//      numThreads++;
+//      threadsTextView.setText(String.valueOf(numThreads));
+//      setNumThreads(numThreads);
+//    } else if (v.getId() == R.id.minus) {
+//      String threads = threadsTextView.getText().toString().trim();
+//      int numThreads = Integer.parseInt(threads);
+//      if (numThreads == 1) {
+//        return;
+//      }
+//      numThreads--;
+//      threadsTextView.setText(String.valueOf(numThreads));
+//      setNumThreads(numThreads);
+//    }
+//  }
 
-  protected void showFrameInfo(String frameInfo) {
-    frameValueTextView.setText(frameInfo);
-  }
+//  protected void showFrameInfo(String frameInfo) {
+//    frameValueTextView.setText(frameInfo);
+//  }
 
-  protected void showCropInfo(String cropInfo) {
-    cropValueTextView.setText(cropInfo);
-  }
+//  protected void showCropInfo(String cropInfo) {
+//    cropValueTextView.setText(cropInfo);
+//  }
 
-  protected void showInference(String inferenceTime) {
-    inferenceTimeTextView.setText(inferenceTime);
-  }
+//  protected void showInference(String inferenceTime) {
+//    inferenceTimeTextView.setText(inferenceTime);
+//  }
 
   protected abstract void updateActiveModel();
   protected abstract void processImage();
