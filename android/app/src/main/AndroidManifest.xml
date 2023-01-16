@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
+        android:name=".FindKiosk"
         android:allowBackup="false"
         android:debuggable="true"
         android:hardwareAccelerated="true"

@@ -16,13 +16,11 @@
 
 package org.tensorflow.lite.examples.detection;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
@@ -31,10 +29,6 @@ import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.tensorflow.lite.examples.detection.customview.OverlayView;
 import org.tensorflow.lite.examples.detection.customview.OverlayView.DrawCallback;
@@ -45,6 +39,10 @@ import org.tensorflow.lite.examples.detection.tflite.Classifier;
 import org.tensorflow.lite.examples.detection.tflite.DetectorFactory;
 import org.tensorflow.lite.examples.detection.tflite.YoloV5Classifier;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
@@ -79,6 +77,15 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     private MultiBoxTracker tracker;
 
     private BorderedText borderedText;
+
+    private Context context;
+
+    private  TTS tts;
+
+    public FindKiosk findKiosk;
+
+//    public  FindKiosk findKiosk = new FindKiosk();
+
 
     @Override
     public void onPreviewSizeChosen(final Size size, final int rotation) {
@@ -148,6 +155,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         String threads = threadsTextView.getText().toString().trim();
         final int numThreads = Integer.parseInt(threads);
 
+
+
         handler.post(() -> {
             if (modelIndex == currentModel && deviceIndex == currentDevice
                     && numThreads == currentNumThreads) {
@@ -214,6 +223,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     @Override
     protected void processImage() {
+
+        findKiosk = (FindKiosk)getApplication();
         ++timestamp;
         final long currTimestamp = timestamp;
         trackingOverlay.postInvalidate();
@@ -248,12 +259,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                         Log.e("CHECK", "run: " + results.size());
 
-                        cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
-                        final Canvas canvas = new Canvas(cropCopyBitmap);
-                        final Paint paint = new Paint();
-                        paint.setColor(Color.RED);
-                        paint.setStyle(Style.STROKE);
-                        paint.setStrokeWidth(2.0f);
+//                        cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
+//                        final Canvas canvas = new Canvas(cropCopyBitmap);
+//                        final Paint paint = new Paint();
+//                        paint.setColor(Color.RED);
+//                        paint.setStyle(Style.STROKE);
+//                        paint.setStrokeWidth(0.3f);
 
                         float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
                         switch (MODE) {
@@ -268,33 +279,64 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         for (final Classifier.Recognition result : results) {
                             final RectF location = result.getLocation();
                             if (location != null && result.getConfidence() >= minimumConfidence) {
-                                canvas.drawRect(location, paint);
+//                                canvas.drawRect(location, paint);
 
                                 cropToFrameTransform.mapRect(location);
 
                                 result.setLocation(location);
                                 mappedRecognitions.add(result);
+
+                                Log.v("trackResults","Processing results : " + results );
                             }
                         }
-
+                        findKiosk.setResult(results);
                         tracker.trackResults(mappedRecognitions, currTimestamp);
                         trackingOverlay.postInvalidate();
 
                         computingDetection = false;
 
-                        runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-//                                        showFrameInfo(previewWidth + "x" + previewHeight);
-//                                        showCropInfo(cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
-//                                        Log.v("사이즈",cropCopyBitmap.getWidth() + "x" + cropCopyBitmap.getHeight());
-//                                        showInference(lastProcessingTimeMs + "ms");
-                                    }
-                                });
+
                     }
                 });
     }
+
+
+
+
+//    public boolean onTouchEvent(MotionEvent event) {
+//
+//        context = ((CameraActivity) CameraActivity.context);
+//        tts = new TTS(context);
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                //손가락으로 화면을 누르기 시작했을 때 할 일
+//                Log.v("Test","ACTION_DOWN");
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                //터치 후 손가락을 움직일 때 할 일
+//                tts.speakOut("키오스크가 발견되지 않았습니다.");
+//                Log.v("Test","ACTION_MOVE");
+//                String state = findKiosk.FindObject();
+////                switch (state){
+////                    case "NotFound":
+////                        tts.speakOut("키오스크가 발견되지 않았습니다.");
+////                }
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                //손가락을 화면에서 뗄 때 할 일
+//                Log.v("Test","ACTION_UP");
+//                break;
+//            case MotionEvent.ACTION_CANCEL:
+//                Log.v("Test","ACTION_CANCEL");
+//                // 터치가 취소될 때 할 일
+//                break;
+//            default:
+//                break;
+//        }
+//        return true;
+//    }
+
+
 
     @Override
     protected int getLayoutId() {

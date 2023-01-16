@@ -22,8 +22,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -38,43 +37,36 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions;
 
+import org.tensorflow.lite.examples.detection.env.ImageUtils;
+import org.tensorflow.lite.examples.detection.env.Logger;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.tensorflow.lite.examples.detection.env.ImageUtils;
-import org.tensorflow.lite.examples.detection.env.Logger;
 
 
 public abstract class CameraActivity extends AppCompatActivity
@@ -119,6 +111,15 @@ public abstract class CameraActivity extends AppCompatActivity
   TextRecognizer textRecognizer= TextRecognition.getClient(new KoreanTextRecognizerOptions.Builder().build());
 
   private Bitmap rgbFrameBitmap = null;
+  public static Context context;
+  private  TTS tts;
+
+  DisplayMetrics displayMetrics = new DisplayMetrics();
+  int DSI_height;
+  int DSI_width;
+
+
+  public  FindKiosk findKiosk;
 
 //  private GraphicOverlay mGraphicOverlay;
 
@@ -128,7 +129,18 @@ public abstract class CameraActivity extends AppCompatActivity
     super.onCreate(null);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+    DSI_height = displayMetrics.heightPixels;
+    DSI_width = displayMetrics.widthPixels;
+
     setContentView(R.layout.tfe_od_activity_camera);
+    this.context = this;
+    tts = new TTS(context);
+
+    this.findKiosk = (FindKiosk)getApplication();
+    findKiosk.Init();
+
+
 //    Toolbar toolbar = findViewById(R.id.toolbar);
 //    setSupportActionBar(toolbar);
 //    getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -240,7 +252,37 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
 
+  public boolean onTouchEvent(MotionEvent event) {
 
+    switch (event.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+        //손가락으로 화면을 누르기 시작했을 때 할 일
+        Log.v("Test","ACTION_DOWN");
+        break;
+      case MotionEvent.ACTION_MOVE:
+        //터치 후 손가락을 움직일 때 할 일
+//        tts.speakOut("키오스크가 발견되지 않았습니다.");
+        Log.v("Test","ACTION_MOVE");
+        findKiosk.FindObject(tts);
+//        switch (state){
+//            case "NotFound":
+//                tts.speakOut("키오스크가 발견되지 않았습니다.");
+//
+//        }
+        break;
+      case MotionEvent.ACTION_UP:
+        //손가락을 화면에서 뗄 때 할 일
+        Log.v("Test","ACTION_UP");
+        break;
+      case MotionEvent.ACTION_CANCEL:
+        Log.v("Test","ACTION_CANCEL");
+        // 터치가 취소될 때 할 일
+        break;
+      default:
+        break;
+    }
+    return true;
+  }
   protected ArrayList<String> getModelStrings(AssetManager mgr, String path){
     ArrayList<String> res = new ArrayList<String>();
     try {
@@ -284,8 +326,11 @@ public abstract class CameraActivity extends AppCompatActivity
       // Initialize the storage bitmaps once when the resolution is known.
       if (rgbBytes == null) {
         Camera.Size previewSize = camera.getParameters().getPreviewSize();
+
         previewHeight = previewSize.height;
         previewWidth = previewSize.width;
+
+
         rgbBytes = new int[previewWidth * previewHeight];
         onPreviewSizeChosen(new Size(previewSize.width, previewSize.height), 90);
       }
@@ -321,6 +366,9 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
 
+
+
+
   /** Callback for Camera2 API */
   @Override
   public void onImageAvailable(final ImageReader reader) {
@@ -344,8 +392,6 @@ public abstract class CameraActivity extends AppCompatActivity
       }
 
 
-
-
       isProcessingFrame = true;
       Trace.beginSection("imageAvailable");
       final Plane[] planes = image.getPlanes();
@@ -353,11 +399,6 @@ public abstract class CameraActivity extends AppCompatActivity
       yRowStride = planes[0].getRowStride();
       final int uvRowStride = planes[1].getRowStride();
       final int uvPixelStride = planes[1].getPixelStride();
-
-
-
-
-
 
       imageConverter =
           new Runnable() {
@@ -397,8 +438,6 @@ public abstract class CameraActivity extends AppCompatActivity
 
   private void TextRecognition(TextRecognizer recognizer){
 
-    Log.v("Test","TextRecognition image : " + image);
-    Log.v("Test","TextRecognition getFormat() : " + image.getFormat());
 
     rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
 
@@ -407,20 +446,11 @@ public abstract class CameraActivity extends AppCompatActivity
     InputImage inputImage = InputImage.fromBitmap(rgbFrameBitmap, 0);
 
 
-
-
     Task<Text> result = recognizer.process(inputImage)
             // 이미지 인식에 성공하면 실행되는 리스너
             .addOnSuccessListener(new OnSuccessListener<Text>() {
               @Override
               public void onSuccess(Text visionText) {
-                Log.v("텍스트 인식", "성공");
-                // Task completed successfully
-                String resultText = visionText.getText();
-//                Log.v("Success",resultText);
-//                text_info.setText(resultText);  // 인식한 텍스트를 TextView에 세팅
-                Log.v("텍스트 인식", resultText);
-
                 processTextRecognitionResult(visionText);
               }
             })
@@ -435,23 +465,30 @@ public abstract class CameraActivity extends AppCompatActivity
                     });
   }
   private void processTextRecognitionResult(Text texts) {
+
+    String resultText = texts.getText();
     List<Text.TextBlock> blocks = texts.getTextBlocks();
+
     if (blocks.size() == 0) {
       Log.v("Test","failed");
       return;
     }
-//    mGraphicOverlay.clear();
-//    for (int i = 0; i < blocks.size(); i++) {
-//      List<Text.Line> lines = blocks.get(i).getLines();
-//      for (int j = 0; j < lines.size(); j++) {
-//        List<Text.Element> elements = lines.get(j).getElements();
-//        for (int k = 0; k < elements.size(); k++) {
-//          GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
-//          mGraphicOverlay.add(textGraphic);
-//
-//        }
-//      }
-//    }
+
+    for (Text.TextBlock block : texts.getTextBlocks()) {
+      String blockText = block.getText();
+      Log.v("Test","blockText            " + blockText );
+      Point[] blockCornerPoints = block.getCornerPoints();
+      for (Text.Line line : block.getLines()) {
+        String lineText = line.getText();
+//        Point[] lineCornerPoints = line.getCornerPoints();
+        for (Text.Element element : line.getElements()) {
+          String elementText = element.getText();
+//          Point[] elementCornerPoints = element.getCornerPoints();
+        }
+      }
+    }
+
+
   }
 
   @Override
@@ -496,6 +533,9 @@ public abstract class CameraActivity extends AppCompatActivity
   public synchronized void onDestroy() {
     LOGGER.d("onDestroy " + this);
     super.onDestroy();
+    if(tts != null){
+      tts.destroy();
+    }
   }
 
   protected synchronized void runInBackground(final Runnable r) {
@@ -608,7 +648,10 @@ public abstract class CameraActivity extends AppCompatActivity
                 public void onPreviewSizeChosen(final Size size, final int rotation) {
                   previewHeight = size.getHeight();
                   previewWidth = size.getWidth();
+
                   CameraActivity.this.onPreviewSizeChosen(size, rotation);
+                  Log.v("사이즈","previewHeight   " +  size.getHeight());
+                  Log.v("사이즈","previewWidth   " +  previewWidth);
                 }
               },
               this,
@@ -660,6 +703,7 @@ public abstract class CameraActivity extends AppCompatActivity
         return 0;
     }
   }
+
 
 //  @Override
 //  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
