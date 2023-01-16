@@ -33,7 +33,6 @@ public class TTS implements TextToSpeech.OnInitListener {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void speakOut(CharSequence text) {
-
         this.tts.setPitch(0.8f);
         this.tts.setSpeechRate(2.0f);
         this.tts.speak(text,TextToSpeech.QUEUE_FLUSH,null,"id1");

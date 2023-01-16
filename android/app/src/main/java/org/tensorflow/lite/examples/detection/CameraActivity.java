@@ -467,6 +467,8 @@ public abstract class CameraActivity extends AppCompatActivity
   private void processTextRecognitionResult(Text texts) {
 
     String resultText = texts.getText();
+
+    findKiosk.setScanText(resultText);
     List<Text.TextBlock> blocks = texts.getTextBlocks();
 
     if (blocks.size() == 0) {
