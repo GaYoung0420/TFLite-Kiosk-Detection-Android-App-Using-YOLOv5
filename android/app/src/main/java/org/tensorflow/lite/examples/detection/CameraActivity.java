@@ -40,10 +40,11 @@ import android.os.Trace;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
-import android.view.MotionEvent;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -121,6 +122,9 @@ public abstract class CameraActivity extends AppCompatActivity
 
   public  FindKiosk findKiosk;
 
+  Button KioskDetectButton;
+  Button MenuReadButton;
+
 //  private GraphicOverlay mGraphicOverlay;
 
   @Override
@@ -139,6 +143,25 @@ public abstract class CameraActivity extends AppCompatActivity
 
     this.findKiosk = (FindKiosk)getApplication();
     findKiosk.Init();
+
+    KioskDetectButton = (Button)findViewById(R.id.KioskDetectButton);
+    KioskDetectButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        findKiosk.FindObject(tts);
+      }
+    });
+
+    MenuReadButton = (Button)findViewById(R.id.MenuReadButton);
+    MenuReadButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+//        findKiosk.FindObject(tts);
+        findKiosk.ReadText(tts);
+      }
+    });
+
+
 
 
 //    Toolbar toolbar = findViewById(R.id.toolbar);
@@ -252,37 +275,36 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
 
-  public boolean onTouchEvent(MotionEvent event) {
 
-    switch (event.getAction()) {
-      case MotionEvent.ACTION_DOWN:
-        //손가락으로 화면을 누르기 시작했을 때 할 일
-        Log.v("Test","ACTION_DOWN");
-        break;
-      case MotionEvent.ACTION_MOVE:
-        //터치 후 손가락을 움직일 때 할 일
-//        tts.speakOut("키오스크가 발견되지 않았습니다.");
-        Log.v("Test","ACTION_MOVE");
-        findKiosk.FindObject(tts);
-//        switch (state){
-//            case "NotFound":
-//                tts.speakOut("키오스크가 발견되지 않았습니다.");
+
+//  public boolean onTouchEvent(MotionEvent event) {
 //
-//        }
-        break;
-      case MotionEvent.ACTION_UP:
-        //손가락을 화면에서 뗄 때 할 일
-        Log.v("Test","ACTION_UP");
-        break;
-      case MotionEvent.ACTION_CANCEL:
-        Log.v("Test","ACTION_CANCEL");
-        // 터치가 취소될 때 할 일
-        break;
-      default:
-        break;
-    }
-    return true;
-  }
+//    switch (event.getAction()) {
+//      case MotionEvent.ACTION_DOWN:
+//        //손가락으로 화면을 누르기 시작했을 때 할 일
+//        Log.v("Test","ACTION_DOWN");
+//        break;
+//      case MotionEvent.ACTION_MOVE:
+//        //터치 후 손가락을 움직일 때 할 일
+//        Log.v("Test","ACTION_MOVE");
+//        findKiosk.FindObject(tts);
+//
+//        break;
+//      case MotionEvent.ACTION_UP:
+//        //손가락을 화면에서 뗄 때 할 일
+//        Log.v("Test","ACTION_UP");
+//        break;
+//      case MotionEvent.ACTION_CANCEL:
+//        Log.v("Test","ACTION_CANCEL");
+//        // 터치가 취소될 때 할 일
+//        break;
+//      default:
+//        break;
+//    }
+//    return true;
+//  }
+
+
   protected ArrayList<String> getModelStrings(AssetManager mgr, String path){
     ArrayList<String> res = new ArrayList<String>();
     try {
@@ -467,7 +489,6 @@ public abstract class CameraActivity extends AppCompatActivity
   private void processTextRecognitionResult(Text texts) {
 
     String resultText = texts.getText();
-
     findKiosk.setScanText(resultText);
     List<Text.TextBlock> blocks = texts.getTextBlocks();
 

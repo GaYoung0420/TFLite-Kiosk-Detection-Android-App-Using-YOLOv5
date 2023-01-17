@@ -18,19 +18,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00000000">
+    android:background="#FFFFFFFF"
+    android:backgroundTint="#FFFFFF"
+    android:layout_weight="5"
+    >
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/View"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@android:color/black"
         android:orientation="vertical">
 
 
         <FrameLayout
             android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:visibility="visible" />
 
         <androidx.appcompat.widget.Toolbar
@@ -39,11 +43,51 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/tfe_semi_transparent" />
 
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="400dp"
+        >
+
+        <Button
+            android:id="@+id/KioskDetectButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/buttonshape"
+            android:contentDescription="키오스크 찾기 버튼"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"
+            android:text="키오스크 찾기 버튼"
+            android:textColor="#000000"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/MenuReadButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/buttonshape2"
+            android:contentDescription="메뉴 읽기 버튼"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"
+            android:text="메뉴 읽기 버튼"
+            android:textColor="#000000"
+            android:textSize="30sp"
+            tools:text="메뉴 읽기 버튼" />
     </LinearLayout>
 
     <include
         android:id="@+id/bottom_sheet_layout"
         layout="@layout/tfe_od_layout_bottom_sheet"
         android:layout_height="535dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

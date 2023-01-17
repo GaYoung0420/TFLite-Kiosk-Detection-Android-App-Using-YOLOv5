@@ -93,6 +93,7 @@ public class MultiBoxTracker {
     frameWidth = width;
     frameHeight = height;
     this.sensorOrientation = sensorOrientation;
+//    Log.v("preview size","width :  " + width + "height :  " + height );
   }
 
   public synchronized void drawDebug(final Canvas canvas) {
