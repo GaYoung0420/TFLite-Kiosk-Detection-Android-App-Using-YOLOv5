@@ -33,12 +33,12 @@ public class FindKiosk extends Application {
 
     public void setResult(final List<Classifier.Recognition> detectResults){
         this.results = detectResults;
-        Log.v("trackResults",""+this.results.size() );
+//        Log.v("trackResults",""+this.results.size() );
     }
 
     public void setScanText(String scan){
         this.scanText = scan;
-
+        Log.v("tracking", "this.scanText       " + this.scanText);
 
     }
 
@@ -46,7 +46,7 @@ public class FindKiosk extends Application {
 
         if(this.results != null){
             if(this.results.size() == 0){
-                Log.v("trackResults","키오스크가 발견되지 않았습니다." );
+//                Log.v("trackResults","키오스크가 발견되지 않았습니다." );
                 tts.speakOut("키오스크가 발견되지 않았습니다." );
                 return;
             }
@@ -54,8 +54,8 @@ public class FindKiosk extends Application {
                 List<Classifier.Recognition> kiosk = new ArrayList<Classifier.Recognition>();;
                 List<Classifier.Recognition> cardreader = new ArrayList<Classifier.Recognition>();;
                 for(Classifier.Recognition i : this.results){
-                    Log.v("trackResults", " id : " + i.getId() + ", title : " + i.getTitle() + ", confidence : " + i.getConfidence() + ", location : " + i.getLocation());
-                    if (i.getConfidence() > 0.8f){
+//                    Log.v("trackResults", " id : " + i.getId() + ", title : " + i.getTitle() + ", confidence : " + i.getConfidence() + ", location : " + i.getLocation());
+                    if (i.getConfidence() > 0.7f){
                         if(i.getTitle().equals("kiosk")){
                             kiosk.add(i);
                         }
@@ -131,7 +131,6 @@ public class FindKiosk extends Application {
                 "에스프레소 콘파냐", "카라멜카페라떼", "카푸치노", "아포카토",
                 "콜드브루라떼", "콜드브루", "말차라떼", "연유라떼", "비엔나커피", "티라미수 라떼"};
 
-
         for (String el : words) {
 
 
@@ -152,35 +151,35 @@ public class FindKiosk extends Application {
                     }
                 }
             }
-            Log.v("tracking", "category       " + category.size());
-            if (category.size() != 0) {
-                for (String ca : category) {
+        }
+        //            Log.v("tracking", "category       " + category.size());
+        if (category.size() != 0) {
+            for (String ca : category) {
 
-                    myString.categoryString += ca + ", ";
-                }
-                myString.categoryString += "가 있습니다.";
-            } else {
-                myString.categoryString += "없습니다.";
+                myString.categoryString += ca + ", ";
             }
+            myString.categoryString += "가 있습니다.";
+        } else {
+            myString.categoryString += "없습니다.";
+        }
 
-            if (menu.size() != 0) {
-                for (String me : menu) {
-                    myString.menuString += me + ", ";
-                }
-                myString.menuString += "가 있습니다.";
-            } else {
-                myString.menuString += " 없습니다.";
+        if (menu.size() != 0) {
+            for (String me : menu) {
+                myString.menuString += me + ", ";
             }
+            myString.menuString += "가 있습니다.";
+        } else {
+            myString.menuString += " 없습니다.";
+        }
 
 
 //            menu.forEach((strKey) -> {
 //                myString.menuString += String.valueOf(strKey) + ", ";
 //                Log.v("tracking","strKey       "+ strKey );
 //            });
-            tts.speakOut(myString.categoryString + "현재 카테고리는 " + myString.nowCategory + "입니다. " + "  " + myString.menuString);
+        tts.speakOut(myString.categoryString + "현재 카테고리는 " + myString.nowCategory + "입니다. " + "  " + myString.menuString);
+        Log.v("tracking",myString.categoryString + "현재 카테고리는 " + myString.nowCategory + "입니다. " + "  " + myString.menuString);
 
-
-        }
     }
 
 }

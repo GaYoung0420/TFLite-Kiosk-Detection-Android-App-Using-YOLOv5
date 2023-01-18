@@ -482,7 +482,7 @@ public abstract class CameraActivity extends AppCompatActivity
                       @Override
                       public void onFailure(@NonNull Exception e) {
                         Log.v("Test","failed");
-                        Log.v("텍스트 인식", "실패: " + e.getMessage());
+//                        Log.v("텍스트 인식", "실패: " + e.getMessage());
                       }
                     });
   }
@@ -673,8 +673,8 @@ public abstract class CameraActivity extends AppCompatActivity
                   previewWidth = size.getWidth();
 
                   CameraActivity.this.onPreviewSizeChosen(size, rotation);
-                  Log.v("사이즈","previewHeight   " +  size.getHeight());
-                  Log.v("사이즈","previewWidth   " +  previewWidth);
+//                  Log.v("사이즈","previewHeight   " +  size.getHeight());
+//                  Log.v("사이즈","previewWidth   " +  previewWidth);
                 }
               },
               this,
